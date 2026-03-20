@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Chat - 8-bit Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" onclick="newChat()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>New chat</span>
+                </button>
+            </div>
+
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput"
+                    placeholder="Search chats..."
+                    onkeyup="filterChats()"
+                >
+            </div>
+
+            <div class="chat-history">
+                <div class="sessions-list" id="sessionsList">
+                    <!-- Chat history items will be inserted here -->
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="settings-btn" title="Settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m3.08 3.08l4.24 4.24M1 12h6m6 0h6m-17.78 7.78l4.24-4.24m3.08-3.08l4.24-4.24"></path>
+                    </svg>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <!-- Header with title and options -->
+            <div class="chat-header">
+                <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Toggle history">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <h1 id="chatTitle">RETROBOT</h1>
+                <div class="header-actions">
+                    <button class="header-action-btn" onclick="toggleFavorite()" title="Add to favorites">
+                        <span>⭐</span>
+                    </button>
+                    <button class="header-action-btn" onclick="openTagModal()" title="Add tags">
+                        <span>🏷️</span>
+                    </button>
+                    <button class="header-action-btn" onclick="openExport()" title="Export chat">
+                        <span>📤</span>
+                    </button>
+                    <button class="clear-btn" onclick="clearChat()" title="Clear chat">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatContainer">
+                <div class="welcome-section">
+                    <!-- Top Border Decoration -->
+                    <div class="welcome-border welcome-border-top">★ ♥ ◆ ★ ♥ ◆ ★ ♥ ◆</div>
+                    <!-- Left Border Decoration -->
+                    <div class="welcome-border welcome-border-left">★<br>♥<br>◆<br>★<br>♥<br>◆<br>★</div>
+                    <!-- Right Border Decoration -->
+                    <div class="welcome-border welcome-border-right">★<br>♥<br>◆<br>★<br>♥<br>◆<br>★</div>
+                    
+                    <div class="welcome-content">
+                        <h2>START A NEW CONVERSATION</h2>
+                        <p>Chat about anything - coding, research, ideas, and more</p>
+                    </div>
+                    
+                    <!-- Bottom Border Decoration -->
+                    <div class="welcome-border welcome-border-bottom">★ ♥ ◆ ★ ♥ ◆ ★ ♥ ◆</div>
+                </div>
+            </div>
+            <!-- Input Area -->
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <input 
+                        type="file" 
+                        id="fileInput" 
+                        accept="image/*" 
+                        style="display: none;"
+                        onchange="handleFileSelect(event)"
+                    >
+                    <div class="input-controls">
+                        <button class="input-btn" onclick="document.getElementById('fileInput').click()" title="Upload image">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        class="message-input"
+                        placeholder="Enter your reply..." 
+                        autocomplete="off"
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button class="send-btn" onclick="sendMessage()" title="Send message">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+                <div class="input-hint">Stay in the game!</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SETTINGS MODAL (Feature 6: User Customization) -->
+    <div id="settingsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Settings</h2>
+                <button onclick="closeSettings()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Theme Selection -->
+                <div class="settings-group">
+                    <label>🎨 Theme</label>
+                    <select id="themeSelect" onchange="updateSetting('theme', this.value)">
+                        <option value="retro">Retro 8-bit</option>
+                        <option value="dark">Dark Mode</option>
+                        <option value="light">Light Mode</option>
+                    </select>
+                </div>
+
+                <!-- Font Size -->
+                <div class="settings-group">
+                    <label>🔤 Font Size: <span id="fontSizeValue">14</span>px</label>
+                    <input type="range" id="fontSizeSlider" min="12" max="18" value="14" 
+                           onchange="updateSetting('font_size', this.value)">
+                </div>
+
+                <!-- Difficulty Level -->
+                <div class="settings-group">
+                    <label>🎮 Difficulty Level</label>
+                    <select id="difficultySelect" onchange="updateSetting('difficulty', this.value)">
+                        <option value="easy">Easy</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+
+                <!-- Syntax Highlighting -->
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="syntaxToggle" checked onchange="updateSetting('syntax_highlighting', this.checked)">
+                        💻 Syntax Highlighting
+                    </label>
+                </div>
+
+                <!-- Auto-Save -->
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="autoSaveToggle" checked onchange="updateSetting('auto_save', this.checked)">
+                        💾 Auto-Save Conversations
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeSettings()" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SESSION EXPORT MODAL (Feature 3: Enhanced Chat History) -->
+    <div id="exportModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📤 Export Chat</h2>
+                <button onclick="closeExport()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Export this conversation as:</p>
+                <button onclick="exportSession('markdown')" class="btn-export">
+                    📝 Markdown (.md)
+                </button>
+                <button onclick="exportSession('pdf')" class="btn-export">
+                    📄 PDF (.pdf)
+                </button>
+                <button onclick="exportSession('json')" class="btn-export">
+                    ⚙️ JSON (.json)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAG INPUT MODAL (Feature 3: Enhanced Chat History) -->
+    <div id="tagModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏷️ Add Tags</h2>
+                <button onclick="closeTagModal()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="tagInput" placeholder="Enter tags separated by commas" class="tag-input">
+                <button onclick="saveTags()" class="btn-primary">Save Tags</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let uploadedImagesData = [];
+        let currentSessionId = null;
+
+        // DOM Elements
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sessionsList = document.getElementById('sessionsList');
+
+        /**
+         * Load chat sessions
+         */
+        async function loadSessions() {
+            try {
+                const response = await fetch('/sessions');
+                const data = await response.json();
+                renderSessions(data.sessions || {});
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+            }
+        }
+
+        /**
+         * Render chat sessions in sidebar
+         */
+        function renderSessions(sessions) {
+            if (!sessions || Object.keys(sessions).length === 0) {
+                sessionsList.innerHTML = '<div class="empty-state">No chats yet</div>';
+                return;
+            }
+
+            sessionsList.innerHTML = '';
+            Object.entries(sessions).forEach(([sessionId, session]) => {
+                const item = document.createElement('div');
+                item.className = 'session-item';
+                
+                const name = session.name || 'Untitled Chat';
+                const truncated = name.length > 30 ? name.substring(0, 30) + '...' : name;
+                
+                item.innerHTML = `
+                    <div class="session-info" onclick="loadSession('${sessionId}')">
+                        <div class="session-name">${truncated}</div>
+                        <div class="session-date">${new Date(session.updated).toLocaleDateString()}</div>
+                    </div>
+                    <div class="session-actions">
+                        <button class="session-action-btn" onclick="renameSession('${sessionId}', '${name.replace(/'/g, "\\'")}', event)" title="Rename">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                            </svg>
+                        </button>
+                        <button class="session-action-btn delete-btn" onclick="deleteSession(event, '${sessionId}')" title="Delete">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                sessionsList.appendChild(item);
+            });
+        }
+
+        /**
+         * New chat
+         */
+        async function newChat() {
+            chatContainer.innerHTML = `
+                <div class="welcome-section">
+                    <div class="welcome-content">
+                        <h2>Start a new conversation</h2>
+                        <p>Chat about anything - coding, research, ideas, and more</p>
+                    </div>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/clear', { method: 'POST' });
+                const data = await response.json();
+                currentSessionId = data.session_id;
+                messageInput.focus();
+            } catch (error) {
+                console.error('Error clearing chat:', error);
+            }
+        }
+
+        /**
+         * Load specific session
+         */
+        async function loadSession(sessionId) {
+            try {
+                const response = await fetch(`/sessions/${sessionId}`);
+                const data = await response.json();
+                currentSessionId = sessionId;
+                
+                // Clear and reload messages
+                chatContainer.innerHTML = '';
+                data.messages.forEach(msg => {
+                    displayMessage(msg.content, msg.role);
+                });
+                
+                messageInput.focus();
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        }
+
+        /**
+         * Delete session
+         */
+        async function deleteSession(event, sessionId) {
+            event.stopPropagation();
+            if (!confirm('Delete this chat?')) return;
+            
+            try {
+                await fetch(`/sessions/${sessionId}`, { method: 'DELETE' });
+                loadSessions();
+            } catch (error) {
+                console.error('Error deleting session:', error);
+            }
+        }
+
+        /**
+         * Rename session
+         */
+        async function renameSession(sessionId, currentName, event) {
+            event.stopPropagation();
+            const newName = prompt('Rename this chat:', currentName);
+            
+            if (!newName || newName.trim() === '') return;
+            
+            try {
+                const response = await fetch(`/sessions/${sessionId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newName.trim() })
+                });
+                
+                if (response.ok) {
+                    loadSessions();
+                }
+            } catch (error) {
+                console.error('Error renaming session:', error);
+            }
+        }
+
+        /**
+         * Filter chats by search
+         */
+        function filterChats() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const items = document.querySelectorAll('.session-item');
+            
+            items.forEach(item => {
+                const name = item.querySelector('.session-name').textContent.toLowerCase();
+                item.style.display = name.includes(searchTerm) ? 'flex' : 'none';
+            });
+        }
+
+        /**
+         * Send suggestion
+         */
+        function sendSuggestion(text) {
+            messageInput.value = text;
+            messageInput.focus();
+            sendMessage();
+        }
+
+        /**
+         * Handle key press
+         */
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        /**
+         * Send message
+         */
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                messageInput.focus();
+                return;
+            }
+
+            // Remove welcome section if exists
+            const welcomeSection = document.querySelector('.welcome-section');
+            if (welcomeSection) {
+                welcomeSection.remove();
+            }
+
+            // Display user message
+            displayMessage(message, 'user');
+            messageInput.value = '';
+            messageInput.disabled = true;
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: message,
+                        images: uploadedImagesData 
+                    })
+                });
+
+                // Remove typing indicator
+                removeTypingIndicator();
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    displayMessage(`Error: ${data.error}`, 'error');
+                } else {
+                    displayMessage(data.reply, 'assistant');
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                displayMessage(`Error: ${error.message}`, 'error');
+            } finally {
+                messageInput.disabled = false;
+                messageInput.focus();
+                loadSessions();
+            }
+        }
+
+        /**
+         * Show typing indicator with animated dots
+         */
+        function showTypingIndicator() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message message-assistant';
+            messageDiv.id = 'typingIndicator';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content typing-indicator';
+            messageContent.innerHTML = '<span class="typing-dot">●</span><span class="typing-dot">●</span><span class="typing-dot">●</span>';
+            
+            messageDiv.appendChild(messageContent);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        /**
+         * Remove typing indicator
+         */
+        function removeTypingIndicator() {
+            const typingDiv = document.getElementById('typingIndicator');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
+        }
+
+        /**
+         * Display message in chat
+         */
+        function displayMessage(content, role) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${role}`;
+            
+            // Parse and format message
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
+            if (role === 'assistant') {
+                // Format with proper markdown parsing
+                let html = escapeHtmlContent(content);
+                
+                // Code blocks with syntax highlighting
+                html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+                    const language = lang || 'text';
+                    const cleanCode = code.trim();
+                    return `<pre class="code-block"><code class="language-${language}">${cleanCode}</code></pre>`;
+                });
+                
+                // Inline code
+                html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+                
+                // Bold text
+                html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+                
+                // Italic text
+                html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+                html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+                
+                // Headings
+                html = html.replace(/^### ([^\n]+)$/gm, '<h3 style="margin: 12px 0 8px; font-size: 14px; font-weight: 600;">$1</h3>');
+                html = html.replace(/^## ([^\n]+)$/gm, '<h2 style="margin: 12px 0 8px; font-size: 16px; font-weight: 600;">$1</h2>');
+                html = html.replace(/^# ([^\n]+)$/gm, '<h1 style="margin: 12px 0 8px; font-size: 18px; font-weight: 600;">$1</h1>');
+                
+                // Bullet lists
+                html = html.replace(/^[\-\*\+] (.+)$/gm, '<li style="margin-left: 20px;">$1</li>');
+                html = html.replace(/(<li[^>]*>.*?<\/li>)/s, '<ul style="margin: 8px 0; padding-left: 0; list-style: disc;">$1</ul>');
+                
+                // Numbered lists
+                html = html.replace(/^\d+\. (.+)$/gm, '<li style="margin-left: 20px;">$1</li>');
+                
+                // Line breaks
+                html = html.replace(/\n/g, '<br>');
+                
+                messageContent.innerHTML = html;
+            } else {
+                messageContent.textContent = content;
+            }
+            
+            messageDiv.appendChild(messageContent);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        /**
+         * Escape HTML content safely
+         */
+        function escapeHtmlContent(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        /**
+         * Handle file select
+         */
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (!files.length) return;
+
+            const file = files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                uploadedImagesData.push({
+                    name: file.name,
+                    data: e.target.result
+                });
+                messageInput.focus();
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        /**
+         * Clear chat
+         */
+        async function clearChat() {
+            if (!confirm('Clear this chat?')) return;
+            
+            try {
+                await fetch('/clear', { method: 'POST' });
+                newChat();
+                loadSessions();
+            } catch (error) {
+                console.error('Error clearing chat:', error);
+            }
+        }
+
+        /**
+         * Toggle sidebar visibility
+         */
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const appContainer = document.querySelector('.app-container');
+            
+            sidebar.classList.toggle('hidden');
+            appContainer.classList.toggle('sidebar-hidden');
+            
+            // Store preference in localStorage
+            const isSidebarHidden = sidebar.classList.contains('hidden');
+            localStorage.setItem('sidebarHidden', isSidebarHidden);
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load saved theme and font size first
+            const savedTheme = localStorage.getItem('theme') || 'retro';
+            const savedFontSize = localStorage.getItem('fontSize') || '14';
+            applyTheme(savedTheme);
+            applyFontSize(savedFontSize);
+
+            // Restore sidebar state from localStorage
+            const isSidebarHidden = localStorage.getItem('sidebarHidden') === 'true';
+            if (isSidebarHidden) {
+                const sidebar = document.querySelector('.sidebar');
+                const appContainer = document.querySelector('.app-container');
+                sidebar.classList.add('hidden');
+                appContainer.classList.add('sidebar-hidden');
+            }
+
+            // Wire up settings button
+            const settingsBtn = document.querySelector('.settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', openSettings);
+            }
+
+            // Close modals when clicking outside
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('click', (event) => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+            
+            newChat();
+            loadSessions();
+            
+            // Refresh sessions every 5 seconds
+            setInterval(loadSessions, 5000);
+        });
+
+        // ============================================================
+        // FEATURE 3: FAVORITES, TAGS, EXPORT, & SETTINGS
+        // ============================================================
+
+        /**
+         * Toggle favorite status for current session
+         */
+        async function toggleFavorite() {
+            if (!currentSessionId) {
+                alert('No active session');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/sessions/${currentSessionId}/favorite`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const isFavorite = data.is_favorite;
+                    
+                    // Update button appearance
+                    const starBtn = document.querySelector('.header-action-btn');
+                    if (starBtn) {
+                        starBtn.style.opacity = isFavorite ? '1' : '0.5';
+                    }
+                    
+                    alert(isFavorite ? '⭐ Added to favorites!' : '⭐ Removed from favorites');
+                    loadSessions();
+                }
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                alert('Error toggling favorite status');
+            }
+        }
+
+        /**
+         * Open tag modal
+         */
+        function openTagModal() {
+            if (!currentSessionId) {
+                alert('No active session');
+                return;
+            }
+            const modal = document.getElementById('tagModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                const tagInput = document.getElementById('tagInput');
+                if (tagInput) tagInput.focus();
+            }
+        }
+
+        /**
+         * Close tag modal
+         */
+        function closeTagModal() {
+            const modal = document.getElementById('tagModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        /**
+         * Save tags for current session
+         */
+        async function saveTags() {
+            if (!currentSessionId) {
+                alert('No active session');
+                return;
+            }
+
+            const tagInput = document.getElementById('tagInput');
+            if (!tagInput) return;
+
+            const tags = tagInput.value
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag.length > 0);
+
+            if (tags.length === 0) {
+                alert('Please enter at least one tag');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/sessions/${currentSessionId}/tags`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tags })
+                });
+
+                if (response.ok) {
+                    alert(`✅ Tags saved: ${tags.join(', ')}`);
+                    tagInput.value = '';
+                    closeTagModal();
+                    loadSessions();
+                }
+            } catch (error) {
+                console.error('Error saving tags:', error);
+                alert('Error saving tags');
+            }
+        }
+
+        /**
+         * Open export modal
+         */
+        function openExport() {
+            if (!currentSessionId) {
+                alert('No active session');
+                return;
+            }
+            const modal = document.getElementById('exportModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        /**
+         * Close export modal
+         */
+        function closeExport() {
+            const modal = document.getElementById('exportModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        /**
+         * Export session in specified format
+         */
+        async function exportSession(format) {
+            if (!currentSessionId) {
+                alert('No active session');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/sessions/${currentSessionId}/export?format=${format}`);
+
+                if (!response.ok) {
+                    alert('Export failed');
+                    return;
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                
+                // Set filename based on format
+                const fileExtension = {
+                    'markdown': 'md',
+                    'pdf': 'pdf',
+                    'json': 'json'
+                }[format] || 'txt';
+                
+                link.download = `chat_${currentSessionId.substring(0, 8)}.${fileExtension}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                
+                alert(`✅ Chat exported as ${format.toUpperCase()}`);
+                closeExport();
+            } catch (error) {
+                console.error('Error exporting session:', error);
+                alert('Error exporting chat');
+            }
+        }
+
+        /**
+         * Open settings modal
+         */
+        function openSettings() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                loadSettings();
+            }
+        }
+
+        /**
+         * Close settings modal
+         */
+        function closeSettings() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        /**
+         * Load user settings from backend
+         */
+        async function loadSettings() {
+            try {
+                const response = await fetch('/settings');
+                const data = await response.json();
+
+                // Update UI elements with saved settings
+                const themeSelect = document.getElementById('themeSelect');
+                if (themeSelect) themeSelect.value = data.theme || 'retro';
+
+                const fontSizeSlider = document.getElementById('fontSizeSlider');
+                if (fontSizeSlider) {
+                    fontSizeSlider.value = data.font_size || 14;
+                    const fontSizeValue = document.getElementById('fontSizeValue');
+                    if (fontSizeValue) fontSizeValue.textContent = fontSizeSlider.value;
+                }
+
+                const difficultySelect = document.getElementById('difficultySelect');
+                if (difficultySelect) difficultySelect.value = data.difficulty || 'normal';
+
+                const syntaxToggle = document.getElementById('syntaxToggle');
+                if (syntaxToggle) syntaxToggle.checked = data.syntax_highlighting !== false;
+
+                const autoSaveToggle = document.getElementById('autoSaveToggle');
+                if (autoSaveToggle) autoSaveToggle.checked = data.auto_save !== false;
+
+                // Apply theme
+                applyTheme(data.theme || 'retro');
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        /**
+         * Update a specific setting
+         */
+        async function updateSetting(key, value) {
+            try {
+                const response = await fetch('/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [key]: value })
+                });
+
+                if (response.ok) {
+                    // Update UI based on setting
+                    if (key === 'theme') {
+                        applyTheme(value);
+                    } else if (key === 'font_size') {
+                        applyFontSize(value);
+                    }
+                    
+                    console.log(`✅ Setting "${key}" updated to "${value}"`);
+                }
+            } catch (error) {
+                console.error('Error updating setting:', error);
+            }
+        }
+
+        /**
+         * Apply theme
+         */
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        /**
+         * Apply font size
+         */
+        function applyFontSize(size) {
+            document.documentElement.style.fontSize = size + 'px';
+            localStorage.setItem('fontSize', size);
+            
+            // Update slider display
+            const fontSizeValue = document.getElementById('fontSizeValue');
+            if (fontSizeValue) fontSizeValue.textContent = size;
+        }
+
+        // ============================================================
+
+        // FEATURE 1: ENHANCED CHAT MODES - Display Query Type
+        const modeEmojis = {
+            'coding': '💻',
+            'research': '📚',
+            'tutorial': '🎓',
+            'writing': '✍️',
+            'creative': '🎨',
+            'debugging': '🐛',
+            'chat': '💬'
+        };
+
+        function displayQueryType(queryType) {
+            // Display query type indicator
+            console.log('Query type:', queryType);
+        }
+
+    </script>
+</body>
+</html>
+
+        // FEATURE 1: ENHANCED CHAT MODES - Display Query Type
+        const modeEmojis = {
+            'coding': '💻',
+            'research': '📚',
+            'tutorial': '🎓',
+            'writing': '✍️',
+            'creative': '🎨',
+            'debugging': '🐛',
+            'chat': '💬'
+        };
+
+        function displayQueryType(queryType) {
+            console.log('Query type:', queryType);
+        }
+
+    </script>
+</body>
+</html>
