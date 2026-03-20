@@ -1,21 +1,21 @@
-# Retrobot 🤖 - 8-bit AI Chat Application
+# Retrobot 
 
 A retro-themed AI chatbot web application powered by Ollama with local LLM support. Features enhanced chat modes, image processing, persistent chat history, and user customization.
 
-## ✨ Features
+##  Features
 
-- **🎮 Retro 8-bit UI Design** - Nostalgic gaming aesthetic with pixelated styling
-- **🤖 Ollama Integration** - Run AI locally using any Ollama-supported model
-- **💬 Smart Chat Modes** - Auto-detects query type: coding, research, tutorial, writing, creative, debugging
-- **🖼️ Image Processing** - Upload images, extract text with OCR, analyze with AI
-- **💾 Persistent Chat History** - All conversations saved locally as JSON
-- **🏷️ Session Management** - Tags, favorites, search, rename, and export chats
-- **📤 Export Options** - Export conversations as Markdown, PDF, or JSON
-- **⚙️ User Customization** - Theme selection, font sizing, difficulty levels, settings
-- **💻 Code Syntax Highlighting** - Formatted code display with language detection
-- **🎯 Intelligent Prompts** - Context-aware system prompts for each chat mode
+- ** Retro 8-bit UI Design** - Nostalgic gaming aesthetic with pixelated styling
+- ** Ollama Integration** - Run AI locally using any Ollama-supported model
+- ** Smart Chat Modes** - Auto-detects query type: coding, research, tutorial, writing, creative, debugging
+- ** Image Processing** - Upload images, extract text with OCR, analyze with AI
+- ** Persistent Chat History** - All conversations saved locally as JSON
+- ** Session Management** - Tags, favorites, search, rename, and export chats
+- ** Export Options** - Export conversations as Markdown, PDF, or JSON
+- ** User Customization** - Theme selection, font sizing, difficulty levels, settings
+- ** Code Syntax Highlighting** - Formatted code display with language detection
+- ** Intelligent Prompts** - Context-aware system prompts for each chat mode
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -60,7 +60,7 @@ python app.py
 
 Then open your browser to: `http://127.0.0.1:8000`
 
-## 📋 Dependencies
+## Dependencies
 
 - **Flask 3.0.0** - Web framework
 - **OpenAI SDK 1.51.0+** - Ollama API compatibility
@@ -71,19 +71,19 @@ Then open your browser to: `http://127.0.0.1:8000`
 - **Markdown 3.5.0** - Markdown parsing
 - **Pygments 2.15.0** - Syntax highlighting
 
-## 🎯 Chat Modes
+## Chat Modes
 
 | Mode | Detection | System Prompt | Use Case |
 |------|-----------|---------------|----------|
-| 💻 **Coding** | Code keywords, syntax | Expert code generator | Programming tasks |
-| 📚 **Research** | Research keywords | Expert researcher | Information gathering |
-| 🎓 **Tutorial** | Learning keywords | Expert educator | Step-by-step guides |
-| ✍️ **Writing** | Writing keywords | Expert writing assistant | Content creation |
-| 🎨 **Creative** | Brainstorm keywords | Creative ideation | Brainstorming |
-| 🐛 **Debugging** | Debug keywords | Debugging expert | Issue resolution |
-| 💬 **Chat** | Default | Helpful assistant | General conversation |
+|  **Coding** | Code keywords, syntax | Expert code generator | Programming tasks |
+|  **Research** | Research keywords | Expert researcher | Information gathering |
+|  **Tutorial** | Learning keywords | Expert educator | Step-by-step guides |
+|  **Writing** | Writing keywords | Expert writing assistant | Content creation |
+|  **Creative** | Brainstorm keywords | Creative ideation | Brainstorming |
+|  **Debugging** | Debug keywords | Debugging expert | Issue resolution |
+|  **Chat** | Default | Helpful assistant | General conversation |
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 Retrobot/
@@ -101,7 +101,7 @@ Retrobot/
     └── style.css         # Retro 8-bit styling
 ```
 
-## 🔧 API Endpoints
+##  API Endpoints
 
 ### Chat
 - `POST /chat` - Send message and get AI response
@@ -122,7 +122,7 @@ Retrobot/
 - `GET /settings` - Get user settings
 - `POST /settings` - Update settings
 
-## 🎨 Customization
+## Customization
 
 ### Themes
 - Retro (8-bit pixel style)
@@ -136,7 +136,7 @@ Retrobot/
 - Auto-save toggle
 - Ollama model selection
 
-## 💡 Features in Detail
+## Features in Detail
 
 ### Image Processing
 - Upload images to include with messages
@@ -155,41 +155,16 @@ Retrobot/
 - **PDF** - Professional formatted document
 - **JSON** - Complete session data
 
-## 🔒 Privacy
+##  Privacy
 
 - All chat data stored locally in `chat_history.json`
 - Settings stored in `user_settings.json`
 - No external API calls beyond Ollama
 - No data sent to external servers
 
-## 🛠️ Development
 
-### Adding New Models
 
-Edit `.env`:
-```env
-OLLAMA_MODEL=your-model-name
-```
 
-### Extending Chat Modes
-
-Add detection keywords in `app.py` `detect_query_type()` function, then add system prompt.
-
-### Modifying Styling
-
-Edit `static/style.css` - uses CSS variables for theming.
-
-## 📝 License
-
-MIT License - See LICENSE file
-
-## 🤝 Contributing
-
-Contributions welcome! Please feel free to submit PRs.
-
-## 📞 Support
-
-For issues or questions, open a GitHub issue.
 
 ---
 
